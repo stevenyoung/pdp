@@ -19,6 +19,7 @@ import logging
 
 import bson
 from flask_pymongo import PyMongo
+from flask_cors import CORS
 
 from flask import Flask
 from flask import jsonify
@@ -26,6 +27,7 @@ from flask import render_template
 from flask import request
 
 app = Flask(__name__)
+CORS(app)
 
 app.config['MONGO_DBNAME'] = 'pdp-nov2016'
 # APP.config['MONGO_URI'] = 'mongodb://localhost:27017/restdb'
