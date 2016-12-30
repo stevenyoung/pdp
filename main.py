@@ -65,6 +65,17 @@ def place_data(scene_id):
   place = mongo.db.places.find_one({'_id': bson.ObjectId(oid=scene_id)})
   return jsonify({'result' : _doc_as_dict(place)})
 
+@app.route('/search/<term>')
+def query_place_collection(term):
+  """ get places where author or title or location name contain search term. """
+  fields = ['author', 'title', 'scenelocation']
+  (query_wrapper, query_conds) = ('$or: [%s]', '')
+  query = ['{{ {}: /^{}/ }},'.format(field, term) for field in fields[:-1]]
+  query_conds += '{{ {}: /^{}/ }}'.format(fields[-1], term)
+  query = query_wrapper.format(query_conds)
+  places = mongo.places.find(query)
+  return jsonify({'result' : places})
+
 @app.route('/')
 def index():
   ''' home page '''
