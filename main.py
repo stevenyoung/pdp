@@ -16,6 +16,7 @@ detailed information on provided place
 """
 
 import logging
+import re
 
 import bson
 from flask_pymongo import PyMongo
@@ -68,13 +69,16 @@ def place_data(scene_id):
 @app.route('/search/<term>')
 def query_place_collection(term):
   """ get places where author or title or location name contain search term. """
-  fields = ['author', 'title', 'scenelocation']
-  (query_wrapper, query_conds) = ('$or: [%s]', '')
-  query = ['{{ {}: /^{}/ }},'.format(field, term) for field in fields[:-1]]
-  query_conds += '{{ {}: /^{}/ }}'.format(fields[-1], term)
-  query = query_wrapper.format(query_conds)
-  places = mongo.places.find(query)
-  return jsonify({'result' : places})
+  query_exp = re.compile('^{}'.format(term), re.IGNORECASE)
+  query_filter = {
+      '$or':[
+          {'author': query_exp},
+          {'title': query_exp},
+          {'scenelocation': query_exp}]}
+  places = mongo.db.places.find(query_filter)
+  places_json = []
+  _ = [places_json.append({'place': _doc_as_dict(place)}) for place in places]
+  return jsonify({'result': places_json})
 
 @app.route('/')
 def index():
