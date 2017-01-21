@@ -50,7 +50,7 @@ def _doc_as_dict(doc=None):
     }
     if doc['scenedescription']:
       summary['scenedescription'] = doc['scenedescription']
-    if doc['notes']:
+    if 'notes' in doc:
       if doc['notes'] != doc['scenedescription']:
         summary['scenedescription'] += ' {}'.format(doc['notes'])
     return summary
