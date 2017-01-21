@@ -43,15 +43,23 @@ MONGO = PyMongo(APP)
 def _doc_as_dict(doc=None):
   """ return mongo doc with fields for rest api """
   if doc:
-    return({'id': str(doc['_id']),
-            'title': doc['title'],
-            'author': doc['author'],
-            'name': doc['scenelocation'],
-            'notes': doc['scenedescription'],
-            'lat': doc['loc']['coordinates'][1],
-            'lng': doc['loc']['coordinates'][0],
-            'loc': doc['loc']
-           })
+    summary = {
+        'id': str(doc['_id']),
+        'title': doc['title'],
+        'author': doc['author'],
+        'name': doc['scenelocation'],
+        'lat': doc['loc']['coordinates'][1],
+        'lng': doc['loc']['coordinates'][0],
+        'loc': doc['loc'],
+        'attribution': doc['attribution'],
+        'url':doc['url']
+    }
+    if doc['scenedescription']:
+      summary['scenedescription'] = doc['scenedescription']
+    if doc['notes']:
+      if doc['notes'] != doc['scenedescription']:
+        summary['scenedescription'] += ' {}'.format(doc['notes'])
+    return summary
   else:
     return None
 
