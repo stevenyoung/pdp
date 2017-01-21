@@ -26,12 +26,14 @@ from flask import Flask
 from flask import jsonify
 from flask import render_template
 
+from app_setup import heroku_config
+
 APP = Flask(__name__)
 CORS(APP)
 
 APP.config['MONGO_DBNAME'] = 'pdp-dec2016'
-(DB_USER, DB_PASS) = ('pdp-mdb', 'S7A-Mza-FJM-JqZ')
-MDB_URI = 'mongodb://{}:{}@ds117839.mlab.com:17839/heroku_jpfrw3tp'
+(DB_USER, DB_PASS) = (heroku_config.DB_USER, heroku_config.DB_PASS)
+MDB_URI = heroku_config.MDB_URI
 
 APP.config['MONGO_URI'] = MDB_URI.format(DB_USER, DB_PASS)
 
