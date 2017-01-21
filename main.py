@@ -23,6 +23,7 @@ from flask_pymongo import PyMongo
 from flask_cors import CORS
 
 from flask import Flask
+from flask import current_app
 from flask import jsonify
 from flask import render_template
 
@@ -56,7 +57,7 @@ def _doc_as_dict(doc=None):
     }
     if doc['scenedescription']:
       summary['scenedescription'] = doc['scenedescription']
-    if doc['notes']:
+    if 'notes' in doc:
       if doc['notes'] != doc['scenedescription']:
         summary['scenedescription'] += ' {}'.format(doc['notes'])
     return summary
@@ -102,7 +103,13 @@ def query_place_collection(term):
 @APP.route('/')
 def index():
   ''' home page '''
-  return render_template('index.html')
+  return current_app.send_static_file('index.html')
+
+
+@APP.route('/<path:path>')
+def static_proxy(path):
+  # send_static_file will guess the correct MIME type
+  return current_app.send_static_file(path)
 
 
 @APP.errorhandler(500)
