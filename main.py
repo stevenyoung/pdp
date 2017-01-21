@@ -30,7 +30,10 @@ APP = Flask(__name__)
 CORS(APP)
 
 APP.config['MONGO_DBNAME'] = 'pdp-dec2016'
-# APP.config['MONGO_URI'] = 'mongodb://localhost:27017/restdb'
+(DB_USER, DB_PASS) = ('pdp-mdb', 'S7A-Mza-FJM-JqZ')
+MDB_URI = 'mongodb://{}:{}@ds117839.mlab.com:17839/heroku_jpfrw3tp'
+
+APP.config['MONGO_URI'] = MDB_URI.format(DB_USER, DB_PASS)
 
 MONGO = PyMongo(APP)
 
