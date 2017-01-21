@@ -47,7 +47,7 @@ def _doc_as_dict(doc=None):
             'title': doc['title'],
             'author': doc['author'],
             'name': doc['scenelocation'],
-            'notes': doc['notes'],
+            'notes': doc['scenedescription'],
             'lat': doc['loc']['coordinates'][1],
             'lng': doc['loc']['coordinates'][0],
             'loc': doc['loc']
