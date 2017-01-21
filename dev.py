@@ -71,7 +71,7 @@ def place_data(scene_id):
 @APP.route('/search/<term>')
 def query_place_collection(term):
   """ places where author or title or location name starts with search term. """
-  query_exp = re.compile('^{}'.format(term), re.IGNORECASE)
+  query_exp = re.compile('{}'.format(term), re.IGNORECASE)
   query_filter = {
       '$or': [
           {'author': query_exp},
