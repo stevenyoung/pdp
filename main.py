@@ -32,12 +32,9 @@ from app_setup import heroku_config
 APP = Flask(__name__)
 CORS(APP)
 
-APP.config['MONGO_DBNAME'] = 'pdp-dec2016'
 (DB_USER, DB_PASS) = (heroku_config.DB_USER, heroku_config.DB_PASS)
 MDB_URI = heroku_config.MDB_URI
-
 APP.config['MONGO_URI'] = MDB_URI.format(DB_USER, DB_PASS)
-
 MONGO = PyMongo(APP)
 
 
@@ -55,7 +52,7 @@ def _doc_as_dict(doc=None):
         'attribution': doc['attribution'],
         'url':doc['url']
     }
-    if doc['scenedescription']:
+    if 'scenedescription' in doc:
       summary['scenedescription'] = doc['scenedescription']
     if 'notes' in doc:
       if doc['notes'] != doc['scenedescription']:
@@ -70,10 +67,10 @@ def nearby(lng, lat):
   ''' return places near given coordinates '''
   query = {'loc': {'$within': {'$center': [[float(lng), float(lat)], 6]}}}
   nearby_places = MONGO.db.places.find(query)
-  output = []
-  for doc in nearby_places:
-    output.append(_doc_as_dict(doc))
-  return jsonify({'result': output})
+  places_json = []
+  [places_json.append({'place': _doc_as_dict(place)}) for place in nearby_places]
+  return jsonify({'result': places_json})
+
 
 
 @APP.route('/place/<scene_id>')
