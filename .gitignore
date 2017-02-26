@@ -13,3 +13,7 @@
 pyvenv.cfg
 .venv
 pip-selfcheck.json
+
+# removing unused files
+templates
+data
