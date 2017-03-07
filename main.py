@@ -31,15 +31,13 @@ from flask import Flask
 from flask import current_app
 from flask import jsonify
 
-from app_setup import heroku_config
-
 APP = Flask(__name__)
 CORS(APP)
 
 try:
   os.environ['PDP_APP_ENV']
-  (DB_USER, DB_PASS) = (heroku_config.DB_USER, heroku_config.DB_PASS)
-  MDB_URI = heroku_config.MDB_URI
+  (DB_USER, DB_PASS) = (os.environ['DB_USER'], os.environ['DB_PASS'])
+  MDB_URI = os.environ['MDB_URI']
   APP.config['MONGO_URI'] = MDB_URI.format(DB_USER, DB_PASS)
 except KeyError:
   APP.config['MONGO_DBNAME'] = 'pdp-jan2016'
