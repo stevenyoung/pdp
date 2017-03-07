@@ -17,3 +17,4 @@ pip-selfcheck.json
 # removing unused files
 templates
 data
+app_setup
