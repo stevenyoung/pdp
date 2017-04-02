@@ -6,7 +6,7 @@ Single-page application as front-end
 /
 Serve index page to client, including the web client which provides a search
 form and interactive map. This single page app will update map and search
-results vai XHR fetch.
+results via XHR fetch.
 
 /search/<term>
 Get a list of places with a search term matched in the author, title or
@@ -21,15 +21,14 @@ Return detailed information on provided place.
 
 import logging
 import os
-import re
-
-import bson
-from flask_pymongo import PyMongo
-from flask_cors import CORS
 
 from flask import Flask
 from flask import current_app
 from flask import jsonify
+from flask_cors import CORS
+
+from datastore import QueryResultsProvider
+
 
 APP = Flask(__name__)
 CORS(APP)
@@ -42,7 +41,7 @@ try:
 except KeyError:
   APP.config['MONGO_DBNAME'] = 'pdp-jan2016'
 
-MONGO = PyMongo(APP)
+DB = QueryResultsProvider(app=APP)
 
 
 def _web_client_keys(doc=None):
@@ -71,36 +70,26 @@ def _web_client_keys(doc=None):
 
 @APP.route('/places/near/<lng>/<lat>')
 def nearby(lng, lat):
-  """ return places near given coordinates """
-  query = {'loc': {'$within': {'$center': [[float(lng), float(lat)], 6]}}}
-  nearby_places = MONGO.db.places.find(query)
-  places_json = []
-  [places_json.append({'place': _web_client_keys(place)})
-   for place in nearby_places]
-  return jsonify({'result': places_json})
+  """ format results of query for places near given coordinates """
+  places = []
+  [places.append({'place': _web_client_keys(place)})
+      for place in DB.get_nearest_results(lng=lng, lat=lat)]
+  return jsonify({'result': places})
 
 
 @APP.route('/place/<scene_id>')
 def place_data(scene_id):
   """ get data for a specific scene """
-  place = MONGO.db.places.find_one({'_id': bson.ObjectId(oid=scene_id)})
+  place = DB.get_place_data(scene_id)
   return jsonify({'result': _web_client_keys(place)})
 
 
 @APP.route('/search/<term>')
 def query_place_collection(term):
   """ places where author or title or location name starts with search term. """
-  query_exp = re.compile('{}'.format(term), re.IGNORECASE)
-  query_filter = {
-      '$or': [
-          {'author': query_exp},
-          {'title': query_exp},
-          {'scenelocation': query_exp}
-      ]
-  }
-  places = MONGO.db.places.find(query_filter)
   places_json = []
-  [places_json.append({'place': _web_client_keys(place)}) for place in places]
+  [places_json.append({'place': _web_client_keys(place)})
+      for place in DB.get_keyword_results(term)]
   return jsonify({'result': places_json})
 
 
