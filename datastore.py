@@ -17,8 +17,6 @@ class DBConnection(object):
 
 class QueryResultsProvider(object):
   """
-  Facade interface to database reads.
-
   Supports two types of query methods: proximity, keyword
   Proximity results return a fixed count of results provided a geo point.
   Keyword queries should return results matching from data in text properties
@@ -28,13 +26,13 @@ class QueryResultsProvider(object):
   def __init__(self, app=None):
     self.connection = DBConnection(app)
 
-  def get_nearest_results(self, lng=None, lat=None):
+  def nearest(self, lng=None, lat=None):
     """ return places near given coordinates """
     query = {'loc': {'$geoWithin': {'$center': [[float(lng), float(lat)], 0.5]}}}
     places = self.connection.mongo.db.places.find(query)
     return places
 
-  def get_keyword_results(self, search_term=None):
+  def keyword(self, search_term=None):
     """ places where author or title or contains search term. """
     query_exp = re.compile('{}'.format(search_term), re.IGNORECASE)
     query_filter = {

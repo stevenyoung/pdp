@@ -44,13 +44,13 @@ except KeyError:
 DB = QueryResultsProvider(app=APP)
 
 
-def _web_client_keys(doc=None):
+def _json_keys(doc=None):
   """ Return mongo doc with fields for rest api."""
   if doc:
     summary = {
         'id': str(doc['_id']),
-        'title': doc['title'],
-        'author': doc['author'],
+        'artwork': doc['title'],
+        'artist': doc['author'],
         'name': doc['scenelocation'],
         'lat': doc['loc']['coordinates'][1],
         'lng': doc['loc']['coordinates'][0],
@@ -71,9 +71,7 @@ def _web_client_keys(doc=None):
 @APP.route('/places/near/<lng>/<lat>')
 def nearby(lng, lat):
   """ format results of query for places near given coordinates """
-  places = []
-  [places.append({'place': _web_client_keys(place)})
-      for place in DB.get_nearest_results(lng=lng, lat=lat)]
+  places = [({'place': _json_keys(place)}) for place in DB.nearest(lng, lat)]
   return jsonify({'result': places})
 
 
@@ -81,15 +79,13 @@ def nearby(lng, lat):
 def place_data(scene_id):
   """ get data for a specific scene """
   place = DB.get_place_data(scene_id)
-  return jsonify({'result': _web_client_keys(place)})
+  return jsonify({'result': _json_keys(place)})
 
 
 @APP.route('/search/<term>')
 def query_place_collection(term):
   """ places where author or title or location name starts with search term. """
-  places_json = []
-  [places_json.append({'place': _web_client_keys(place)})
-      for place in DB.get_keyword_results(term)]
+  places_json = [({'place': _json_keys(place)}) for place in DB.keyword(term)]
   return jsonify({'result': places_json})
 
 

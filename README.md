@@ -23,3 +23,10 @@ short description fields as JSON.
 
 `/places/<id>`
 >Return detailed information on provided place as JSON.
+
+Install:
+activate virtualenv
+pip install -r requirements.txt
+
+Run:
+gunicorn main:APP
