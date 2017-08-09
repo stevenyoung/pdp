@@ -1,0 +1,12 @@
+runtime: python
+env: flex
+entrypoint: gunicorn -b :$PORT main:APP
+
+runtime_config:
+  python_version: 3
+
+env_variables:
+  PDP_APP_ENV: True
+  DB_USER: 'user'
+  DB_PASS: 'pass'
+  MDB_URI: 'mongodb://{}:{}@db-server:port/name'
